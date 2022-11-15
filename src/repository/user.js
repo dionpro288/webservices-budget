@@ -1,5 +1,10 @@
-const { tables, getKnex } = require('../data');
-const { getLogger } = require('../core/logging');
+const {
+  tables,
+  getKnex,
+} = require('../data');
+const {
+  getLogger,
+} = require('../core/logging');
 
 /**
  * Get all users.
@@ -31,6 +36,17 @@ const findById = (id) => {
 };
 
 /**
+ * Find a user with the given auth0 id.
+ *
+ * @param {string} auth0id - The id to search for.
+ */
+const findByAuth0Id = (auth0id) => {
+  return getKnex()(tables.user)
+    .where('auth0id', auth0id)
+    .first();
+};
+
+/**
  * Create a new user with the given `name`.
  *
  * @param {object} user - User to create.
@@ -40,11 +56,13 @@ const findById = (id) => {
  */
 const create = async ({
   name,
+  auth0id,
 }) => {
   try {
     const [id] = await getKnex()(tables.user)
       .insert({
         name,
+        auth0id,
       });
     return id;
   } catch (error) {
@@ -67,11 +85,13 @@ const create = async ({
  */
 const updateById = async (id, {
   name,
+  auth0id,
 }) => {
   try {
     await getKnex()(tables.user)
       .update({
         name,
+        auth0id,
       })
       .where('id', id);
     return id;
@@ -108,6 +128,7 @@ module.exports = {
   findAll,
   findCount,
   findById,
+  findByAuth0Id,
   create,
   updateById,
   deleteById,

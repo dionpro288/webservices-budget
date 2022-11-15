@@ -3,12 +3,24 @@ const config = require('config');
 const koaCors = require('@koa/cors');
 const bodyParser = require('koa-bodyparser');
 const emoji = require('node-emoji');
-const { serializeError } = require('serialize-error');
+const {
+  serializeError,
+} = require('serialize-error');
 
-const { initializeLogger, getLogger } = require('./core/logging');
+const {
+  initializeLogger,
+  getLogger,
+} = require('./core/logging');
 const ServiceError = require('./core/serviceError');
-const { initializeData, shutdownData } = require('./data');
+const {
+  initializeData,
+  shutdownData,
+} = require('./data');
 const installRest = require('./rest');
+const {
+  checkJwtToken,
+} = require('./core/auth');
+
 
 const NODE_ENV = config.get('env');
 const CORS_ORIGINS = config.get('cors.origins');
@@ -16,15 +28,18 @@ const CORS_MAX_AGE = config.get('cors.maxAge');
 const LOG_LEVEL = config.get('log.level');
 const LOG_DISABLED = config.get('log.disabled');
 
-module.exports = async function createServer () {
+module.exports = async function createServer() {
   initializeLogger({
     level: LOG_LEVEL,
     disabled: LOG_DISABLED,
-    defaultMeta: { NODE_ENV },
+    defaultMeta: {
+      NODE_ENV,
+    },
   });
 
   await initializeData();
 
+  const logger = getLogger();
   const app = new Koa();
 
   // Add CORS
@@ -42,7 +57,8 @@ module.exports = async function createServer () {
     }),
   );
 
-  const logger = getLogger();
+
+  app.use(checkJwtToken());
 
   app.use(bodyParser());
 
@@ -123,11 +139,11 @@ module.exports = async function createServer () {
   installRest(app);
 
   return {
-    getApp(){
+    getApp() {
       return app;
     },
 
-    start(){
+    start() {
       return new Promise((resolve) => {
         const port = config.get('port');
         app.listen(port);
@@ -136,7 +152,7 @@ module.exports = async function createServer () {
       });
     },
 
-    async stop(){
+    async stop() {
       {
         app.removeAllListeners();
         await shutdownData();

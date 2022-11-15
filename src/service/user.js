@@ -1,4 +1,6 @@
-const { getLogger } = require('../core/logging');
+const {
+  getLogger,
+} = require('../core/logging');
 const ServiceError = require('../core/serviceError');
 const userRepository = require('../repository/user');
 
@@ -15,10 +17,14 @@ const debugLog = (message, meta = {}) => {
  */
 const register = ({
   name,
+  auth0id,
 }) => {
-  debugLog('Creating a new user', { name });
+  debugLog('Creating a new user', {
+    name,
+  });
   return userRepository.create({
     name,
+    auth0id,
   });
 };
 
@@ -49,13 +55,26 @@ const getById = async (id) => {
   const user = await userRepository.findById(id);
 
   if (!user) {
-    throw ServiceError.notFound(`No user with id ${id} exists`, { id });
+    throw ServiceError.notFound(`No user with id ${id} exists`, {
+      id,
+    });
   }
 
   return user;
 };
 
+const getByAuth0Id = async (auth0id) => {
+  debugLog(`Fetching user with auth0id ${auth0id}`);
+  const user = await userRepository.findByAuth0Id(auth0id);
 
+  if (!user) {
+    throw ServiceError.notFound(`No user with id ${auth0id} exists`, {
+      auth0id,
+    });
+  }
+
+  return user;
+};
 /**
  * Update an existing user.
  *
@@ -66,9 +85,15 @@ const getById = async (id) => {
  * @throws {ServiceError} One of:
  * - NOT_FOUND: No user with the given id could be found.
  */
-const updateById = (id, { name }) => {
-  debugLog(`Updating user with id ${id}`, { name });
-  return userRepository.updateById(id, { name });
+const updateById = (id, {
+  name,
+}) => {
+  debugLog(`Updating user with id ${id}`, {
+    name,
+  });
+  return userRepository.updateById(id, {
+    name,
+  });
 };
 
 
@@ -85,7 +110,9 @@ const deleteById = async (id) => {
   const deleted = await userRepository.deleteById(id);
 
   if (!deleted) {
-    throw ServiceError.notFound(`No user with id ${id} exists`, { id });
+    throw ServiceError.notFound(`No user with id ${id} exists`, {
+      id,
+    });
   }
 };
 
@@ -93,6 +120,7 @@ module.exports = {
   register,
   getAll,
   getById,
+  getByAuth0Id,
   updateById,
   deleteById,
 };

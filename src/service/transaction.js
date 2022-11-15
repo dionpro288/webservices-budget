@@ -1,8 +1,9 @@
-const { getLogger } = require('../core/logging');
+const {
+  getLogger,
+} = require('../core/logging');
 const ServiceError = require('../core/serviceError');
 const transactionRepository = require('../repository/transaction');
 
-const userService = require('./user');
 
 const debugLog = (message, meta = {}) => {
   if (!this.logger) this.logger = getLogger();
@@ -32,7 +33,9 @@ const getById = async (id) => {
   const transaction = await transactionRepository.findById(id);
 
   if (!transaction) {
-    throw ServiceError.notFound(`There is no transaction with id ${id}`, { id });
+    throw ServiceError.notFound(`There is no transaction with id ${id}`, {
+      id,
+    });
   }
 
   return transaction;
@@ -44,14 +47,21 @@ const getById = async (id) => {
  * @param {object} transaction - The transaction to create.
  * @param {number} transaction.amount - Amount deposited/withdrawn.
  * @param {Date} transaction.date - Date of the transaction.
- * @param {string} transaction.placeId - Id of the place the transaction happened.
- * @param {string} transaction.user - Name of the user who did the transaction.
+ * @param {number} transaction.placeId - Id of the place the transaction happened.
+ * @param {number} transaction.userId - Id of the user who did the transaction.
  */
-const create = async ({ amount, date, placeId, user }) => {
-  debugLog('Creating new transaction', { amount, date, placeId, user });
-
-  // For now simply create a new user every time
-  const userId = await userService.register({ name: user });
+const create = async ({
+  amount,
+  date,
+  placeId,
+  userId,
+}) => {
+  debugLog('Creating new transaction', {
+    amount,
+    date,
+    placeId,
+    userId,
+  });
 
   const id = await transactionRepository.create({
     amount,
@@ -69,19 +79,21 @@ const create = async ({ amount, date, placeId, user }) => {
  * @param {object} transaction - The transaction data to save.
  * @param {number} [transaction.amount] - Amount deposited/withdrawn.
  * @param {Date} [transaction.date] - Date of the transaction.
- * @param {string} [transaction.placeId] - Id of the place the transaction happened.
- * @param {string} [transaction.user] - Name of the user who did the transaction.
+ * @param {number} [transaction.placeId] - Id of the place the transaction happened.
+ * @param {number} [transaction.userId] - Id of the user who did the transaction.
  */
-const updateById = async (id, { amount, date, placeId, user }) => {
+const updateById = async (id, {
+  amount,
+  date,
+  placeId,
+  userId,
+}) => {
   debugLog(`Updating transaction with id ${id}`, {
     amount,
     date,
     placeId,
-    user,
+    userId,
   });
-
-  // For now simply create a new user every time
-  const userId = await userService.register({ name: user });
 
   await transactionRepository.updateById(id, {
     amount,

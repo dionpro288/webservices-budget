@@ -3,6 +3,8 @@ const createServer = require('./createServer');
 async function main() {
   try {
     const server = await createServer();
+
+
     await server.start();
 
     async function onClose() {
@@ -12,7 +14,7 @@ async function main() {
 
     process.on('SIGTERM', onClose);
     process.on('SIGQUIT', onClose);
-  } catch (error){
+  } catch (error) {
     process.exit(-1);
   }
 }
