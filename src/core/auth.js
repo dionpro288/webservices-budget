@@ -46,7 +46,7 @@ async function addUserInfo(ctx) {
 	try {
 		const token = ctx.headers.authorization;
 		const url = AUTH_USER_INFO;
-		if (token && url && ctx.user.state) {
+		if (token && url && ctx.state.user) {
 			logger.debug(`addUserInfo: ${url}, ${JSON.stringify(token)}`);
 
 			const userInfo = await axios.get(url, {
