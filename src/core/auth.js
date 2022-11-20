@@ -19,7 +19,7 @@ function getJwtSecret() {
 		});
 		return secretFunction;
 	} catch (error) {
-		logger.error(error);
+		logger.error('Something went worng when handling the JWT secret', { error });
 		throw error;
 	}
 }
@@ -35,11 +35,8 @@ function checkJwtToken() {
 			algorithms: ['RS256'],
 			passthrough: true, // ctx.state.user will be undefined if no valid JWT is provided
 		});
-		// .unless({
-		//   path: [], // whitelist urls
-		// }),
 	} catch (error) {
-		logger.error(error);
+		logger.error('Something went wrong when checking the JWT', { error });
 		throw error;
 	}
 }
@@ -64,7 +61,7 @@ async function addUserInfo(ctx) {
 			};
 		}
 	} catch (error) {
-		logger.error(error);
+		logger.error('Something went wrong when fetching user info', { error });
 		throw error;
 	}
 }
