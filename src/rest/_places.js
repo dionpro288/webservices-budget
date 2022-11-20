@@ -1,6 +1,10 @@
 const Joi = require('joi');
 const Router = require('@koa/router');
 
+const {
+  hasPermission,
+  permissions,
+} = require('../core/auth');
 const placeService = require('../service/place');
 
 const validate = require('./_validation.js');
@@ -64,11 +68,11 @@ module.exports = (app) => {
     prefix: '/places',
   });
 
-  router.get('/', validate(getAllPlaces.validationScheme), getAllPlaces);
-  router.post('/', validate(createPlace.validationScheme), createPlace);
-  router.get('/:id', validate(getPlaceById.validationScheme), getPlaceById);
-  router.put('/:id', validate(updatePlace.validationScheme), updatePlace);
-  router.delete('/:id', validate(deletePlace.validationScheme), deletePlace);
+  router.get('/', hasPermission(permissions.read), validate(getAllPlaces.validationScheme), getAllPlaces);
+  router.post('/', hasPermission(permissions.write), validate(createPlace.validationScheme), createPlace);
+  router.get('/:id', hasPermission(permissions.read), validate(getPlaceById.validationScheme), getPlaceById);
+  router.put('/:id', hasPermission(permissions.write), validate(updatePlace.validationScheme), updatePlace);
+  router.delete('/:id', hasPermission(permissions.write), validate(deletePlace.validationScheme), deletePlace);
 
   app.use(router.routes()).use(router.allowedMethods());
 };
