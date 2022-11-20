@@ -133,7 +133,7 @@ module.exports = async function createServer() {
 
       if (ctx.state.jwtOriginalError) {
         statusCode = 403;
-        errorBody.details.jwtOriginalError = ctx.state.jwtOriginalError;
+        errorBody.details.jwtOriginalError = serializeError(ctx.state.jwtOriginalError);
       }
 
       ctx.status = statusCode;
