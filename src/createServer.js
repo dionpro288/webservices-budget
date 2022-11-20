@@ -131,6 +131,11 @@ module.exports = async function createServer() {
         }
       }
 
+      if (ctx.state.jwtOriginalError) {
+        statusCode = 403;
+        errorBody.details.jwtOriginalError = ctx.state.jwtOriginalError;
+      }
+
       ctx.status = statusCode;
       ctx.body = errorBody;
     }
